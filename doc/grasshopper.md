@@ -1,11 +1,53 @@
-# Grasshopperについて
+# GrasshopperのC#コンポーネントについて
+## 入手先
+Rhinocerosは有償のソフトです。使い続けるにはライセンスが必要です。3ヶ月間は無償で評価する事ができるので、直ぐに試して見ることができます。以下のサイトからダウンロードできます。  
+https://www.rhino3d.com/jp/download
+
+GrasshopperはRhinoceros上で複雑な形状を実現するためのノンプログラミングツールです。しかし、プログラミングをすることもできて、ここではむしろそのようにしか使いません。C#は標準で使えます。  
+http://www.grasshopper3d.com/page/download-1
+
+ここでは解説しませんが別途インストールすればPythonという言語も使うことが出来ます。  
+www.food4rhino.com/project/ghpython
+
+関係ありませんが、Windowsの仮想環境を簡単に作りたいときは以下のサイトに正規のイメージファイルがおいてあります。  
+https://dev.modern.ie/tools/vms/windows/
+
+ラボライセンスをはじめとするZooサーバーの利用の仕方は以下のサイトに公式のFAQがあります。  
+http://www.rhino3d.co.jp/support/faq_detail.html
+## C#コンポーネントの基本
+インストールが出来たらスタートメニューからRhinoceros 5を起動したください。(64-bit)と書かれている方をお勧めします。  
+起動したらgrasshopperと入力して起動してください。初回起動時には規約への同意が求められるので適宜対処してください。  
+grasshopperが起動すると適当な場所でダブルクリックしてC#と入力すればC#コンポーネントが作成できます。
+
+C#コンポーネントが出来たら真ん中の部分をダブルクリックしたください。
+Script Editorというのが現れるはずです。ここでC#スクリプトを入力します。
+白い部分が入力できるところです。左側の+とか-とか書いているところをクリックすると省略したり省略されている部分を展開したりできます。  
+Script Editorを閉じて次はマウスのスクロールホイールでC#コンポーネントをズームしてみてください。
++とか-とかが見れるはずです。これは、入力と出力を増やしたり減らしたりするためのボタンです。  
+xやyといった変数を右クリックしてみてください。一番上の変数が書いてある部分は実はテキストボックスになっていて変数名を変更できます。名前にはスペースを入れないでください。  
+下の方のType Hintでは引数の型を設定できます。  
+Item AccessとList Accessを切り替えれば複数の値が入力された場合の対処が変化します。
+Item Accessの場合に複数の値が入力されればその回数だけ全体が繰り返されます。List Accessの場合はListとして入力されるので自前で処理することが出来ます。
+Tree Accessはまず使うことはありません。
+
+Rhinoceros画面上にあるオブジェクトを操作する場合にはC#コンポーネント以外のコンポーネントを使う必要があります。
+例えば、Surfaceを扱いたいならSurfaceコンポーネントを追加します。それを右クリックしSet one Surfaceとした後に選択してください。  
+そのようにして設定した値はRhinocerosを再起動する度に設定しなおさなければなりません。
+grasshopper側にそれらを保存したい場合、コンポーネントを右クリックしたInternalise dataをクリックしたください。
+
+C#コンポーネント等で作成したジオメトリはgrasshopperウィンドウを閉じると消えてしまいます。
+それをRhinoceros上に配置するには各コンポーネントを右クリックしBakeを押します。
+プレビューが邪魔な場合はPreviewをクリックします。
+複数選択しスクロールボタンをクリックすることで複数のコンポーネントを一度に操作できます。
+なおBakeはC#コンポーネント上でも出来るので後で解説します。
 ## よく使う手法
 GrasshopperのC#ではよく使う手法がいくつかあります。  
 サンプルはsrcにおいてあります。
 ### 3dグラフ
 3次元上の複数の点を通るサーフェスを表現する際に便利なのは``NurbsSurface.CreateFromPoints()``関数です。この関数はPoint3dの配列からそれを通るNurbsSurfaceを作ってくれます。
-厳密な意味で正しい形状が出来るわけではありませんが、それっぽい形を作るには便利です。  
-000.3dGraph.ghxではサンプルを
+厳密な意味で正しい形状が出来るわけではありませんが、それっぽい形を作るには便利です。
+
+000.3dGraph.ghxでは簡単な例を示しています。
 ```
   private void RunScript(Interval x, Interval y, ref object A)
   {
@@ -24,7 +66,7 @@ GrasshopperのC#ではよく使う手法がいくつかあります。
     A = Rhino.Geometry.NurbsSurface.CreateFromPoints(points.ToArray(), uCount, vCount, 3, 3);
   }
 ```
-003.3dGraphClass.ghxではより実践的なサンプルを載せています。クラスやdelegateといった説明していない複雑な手法を用いています。
+001.3dGraphClass.ghxではより実践的なサンプルを載せています。クラスやdelegateといった説明していない複雑な手法を用いています。
 時間がない場合にはあまり詳しく読み込む事はお勧めしません。そのままコピーして使ってください。
 ```
   /// <summary>
@@ -89,12 +131,14 @@ GrasshopperのC#ではよく使う手法がいくつかあります。
 通常grasshopperではオブジェクトを追加する場合には手作業でBakeを行わなければならずレイヤー分けも自分で行わなければなりません。
 その際に便利なのは、``RhinoDocument.Objects.Add(geometry);``関数です。
 この関数はRhinoDocumentというScript_Instanceクラスで使われている関数なのでその外や子クラスでは受け渡しをしないと使えませんし、場合によっては"RhinoDocument"という部分が変わります。
-つまり、RunScript関数内か引数にRhinoDoc型を持つ関数内で使える関数です。  
+つまり、RunScript関数内か引数にRhinoDoc型を持つ関数内で使える関数です。
+
 この関数の使い方はとても簡単です。たとえば、C#コンポーネントをつくり入力xの型をGeometryBaseにして、RunScriptの中身を以下のように書き換えてみてください。
 ```
   RhinoDocument.Objects.Add(x);
 ```
-入力xに適当なジオメトリ、例えば球を入力すれば入力した瞬間にRhinoceros画面上にそのジオメトリが追加されます。  
+入力xに適当なジオメトリ、例えば球を入力すれば入力した瞬間にRhinoceros画面上にそのジオメトリが追加されます。
+
 このやり方で注意が必要なのは入力値が変わるたび毎にジオメトリが追加されることです。
 例えば球のサイズをスライダーで入力していれば一度に動かすだけでいくつも球が追加されます。
 その対策として、C#コンポーネントの入力のひとつをbool型にしてそれにBooleanToggleコンポーネントをつなぐという手法がよく使われます。
@@ -115,7 +159,8 @@ GrasshopperのC#ではよく使う手法がいくつかあります。
 ```
 その他にレイヤーを自動設定することもできます。その場合は既にあるレイヤーの場合``RhinoDocument.Layers.FindByFullPath(レイヤー名, false);``から、まだないレイヤーの場合には``RhinoDocument.Layers.Add(レイヤー名)``によって作成しレイヤー番号を取得できます。
 レイヤーがない場合には前者は-1を返すのでifを使って対処できます。
-その後上の例なら``objAttr.LayerIndex``に上で得たレイヤー番号を代入してください。  
+その後上の例なら``objAttr.LayerIndex``に上で得たレイヤー番号を代入してください。
+
 004.BakeAdvanced.ghxは簡単に色とレイヤー名を指定できるようにしたものです。
 ```
   private void RunScript(GeometryBase obj, List<Color> color, string layer, bool bake)
