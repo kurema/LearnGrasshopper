@@ -46,7 +46,8 @@ GrasshopperのC#ではよく使う手法がいくつかあります。
 https://github.com/kurema/LearnGrasshopper/tree/master/src
 ## 基本
 Grasshopperやモデリングではよく使う手法はたいていC#上でそれなりに簡単に利用することができます。
-Script Editor を開いたらRunScript内にまず``A=Rhino.Geometry.``と打ち込んでください。そうすると予測変換の要領でいろんな文字が表示されます。これはモデリングソフトでの基本的なジオメトリ作成に相当する操作です。以下に例を挙げます。適当な行を抜き出して試してみてください。
+Script Editor を開いたらRunScript内にまず``A=Rhino.Geometry.``と打ち込んでください。そうすると予測変換の要領でいろんな文字が表示されます。これはモデリングソフトでの基本的なジオメトリ作成に相当する操作です。以下に例を挙げます。適当な行を抜き出して試してみてください。  
+000.basic.ghxにまとめてあります。
 ```
     A = new Rhino.Geometry.Point3d(1, 3, 4);
     A = new Rhino.Geometry.Vector3d(0, 4, 2);
@@ -106,7 +107,7 @@ Pipe
 3次元上の複数の点を通るサーフェスを表現する際に便利なのは``NurbsSurface.CreateFromPoints()``関数です。この関数はPoint3dの配列からそれを通るNurbsSurfaceを作ってくれます。
 厳密な意味で正しい形状が出来るわけではありませんが、それっぽい形を作るには便利です。
 
-000.3dGraph.ghxでは簡単な例を示しています。
+001.3dGraph.ghxでは簡単な例を示しています。
 ```
   private void RunScript(Interval x, Interval y, ref object A)
   {
@@ -125,7 +126,7 @@ Pipe
     A = Rhino.Geometry.NurbsSurface.CreateFromPoints(points.ToArray(), uCount, vCount, 3, 3);
   }
 ```
-001.3dGraphClass.ghxではより実践的なサンプルを載せています。クラスやdelegateといった説明していない複雑な手法を用いています。
+002.3dGraphClass.ghxではより実践的なサンプルを載せています。クラスやdelegateといった説明していない複雑な手法を用いています。
 時間がない場合にはあまり詳しく読み込む事はお勧めしません。そのままコピーして使ってください。
 ```
   /// <summary>
@@ -220,7 +221,7 @@ Pipe
 レイヤーがない場合には前者は-1を返すのでifを使って対処できます。
 その後上の例なら``objAttr.LayerIndex``に上で得たレイヤー番号を代入してください。
 
-004.BakeAdvanced.ghxは簡単に色とレイヤー名を指定できるようにしたものです。
+005.BakeAdvanced.ghxは簡単に色とレイヤー名を指定できるようにしたものです。
 ```
   private void RunScript(GeometryBase obj, List<Color> color, string layer, bool bake)
   {
