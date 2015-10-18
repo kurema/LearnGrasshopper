@@ -42,7 +42,66 @@ C#コンポーネント等で作成したジオメトリはgrasshopperウィン�
 なおBakeはC#コンポーネント上でも出来るので後で解説します。
 ## よく使う手法
 GrasshopperのC#ではよく使う手法がいくつかあります。  
-サンプルはsrcにおいてあります。
+サンプルは以下においてあります。  
+https://github.com/kurema/LearnGrasshopper/tree/master/src
+## 基本
+Grasshopperやモデリングではよく使う手法はたいていC#上でそれなりに簡単に利用することができます。
+Script Editor を開いたらRunScript内にまず``A=Rhino.Geometry.``と打ち込んでください。そうすると予測変換の要領でいろんな文字が表示されます。これはモデリングソフトでの基本的なジオメトリ作成に相当する操作です。以下に例を挙げます。適当な行を抜き出して試してみてください。
+```
+    A = new Rhino.Geometry.Point3d(1, 3, 4);
+    A = new Rhino.Geometry.Vector3d(0, 4, 2);
+    A = new Rhino.Geometry.Matrix(3, 3);
+    A = new Rhino.Geometry.Plane(Point3d.Origin, Vector3d.XAxis, Vector3d.ZAxis);
+
+    A = new Rhino.Geometry.Circle(4);
+    A = new Rhino.Geometry.Arc(new Circle(5), Math.PI / 4.0);
+    A = new Rhino.Geometry.BezierCurve(new Point3d[]{new Point3d(0, 0, 0),new Point3d(5, 3, 0),new Point3d(8, -1, 0)}).ToNurbsCurve();
+    A = new Rhino.Geometry.Box(Plane.WorldXY, new Interval(0, 1), new Interval(-1, 1), new Interval(0, 3));
+    A = new Rhino.Geometry.Cone(Plane.WorldXY, 10, 3);
+    A = new Rhino.Geometry.Cylinder(new Circle(4), 10);
+    A = new Rhino.Geometry.Line(Point3d.Origin, new Point3d(1, 4, 2));
+    A = new Rhino.Geometry.Rectangle3d(Plane.WorldXY, 2, 4);
+    A = new Rhino.Geometry.Torus(Plane.WorldXY, 10, 3);
+
+    var p = new Rhino.Geometry.Polyline(0);
+    p.Add(1, 3, 4);
+    p.Add(4, 2, 8);
+    p.Add(0, 2, 5);
+    A = p;
+    
+    A = Rhino.Geometry.NurbsCurve.CreateInterpolatedCurve(new Point3d[]{new Point3d(0, 0, 0),new Point3d(5, 3, 0),new Point3d(8, -1, 0)}, 3);
+
+```
+その他にいくつかの基本的な操作が可能です。
+
+まず立体を作るときによく使うExtrusionです。
+```
+private void RunScript(Curve x, ref object A)
+  {
+    A = Surface.CreateExtrusion(x, Vector3d.ZAxis * 10);
+  }
+```
+Loftですが、始点・終点の指定があるのが違っています。
+```
+  private void RunScript(List<Curve> x, object y, ref object A)
+  {
+    A = Brep.CreateFromLoft(x, Point3d.Origin, Point3d.Origin + Vector3d.ZAxis * 8, LoftType.Tight, false);
+  }
+```
+Revolve(軸を中心とした回転)
+```
+    A = RevSurface.Create(NurbsCurve.CreateInterpolatedCurve(new Point3d[]{new Point3d(2, 0, 0),new Point3d(4, 0, 2),new Point3d(3, 0, 4)}, 3), new Line(0, 0, 0, 0, 0, 10)).ToNurbsSurface();
+```
+Sweep
+```
+    var curve1 = NurbsCurve.CreateInterpolatedCurve(new Point3d[]{new Point3d(2, 0, 0),new Point3d(4, 0, 2),new Point3d(3, 0, 4)}, 3);
+    A = Brep.CreateFromSweep(curve1, new Arc(new Circle(1), Math.PI * 7 / 4.0).ToNurbsCurve(), false, 0.1);
+```
+Pipe
+```
+    var curve1 = NurbsCurve.CreateInterpolatedCurve(new Point3d[]{new Point3d(2, 0, 0),new Point3d(4, 0, 2),new Point3d(3, 0, 4)}, 3);
+    A = Brep.CreatePipe(curve1, 1.0, false, PipeCapMode.Round, true, 0.1, 0.1);
+```
 ### 3dグラフ
 3次元上の複数の点を通るサーフェスを表現する際に便利なのは``NurbsSurface.CreateFromPoints()``関数です。この関数はPoint3dの配列からそれを通るNurbsSurfaceを作ってくれます。
 厳密な意味で正しい形状が出来るわけではありませんが、それっぽい形を作るには便利です。
