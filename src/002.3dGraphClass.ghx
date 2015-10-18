@@ -83,23 +83,42 @@
               </items>
               <chunks count="1">
                 <chunk name="Container">
-                  <items count="9">
+                  <items count="8">
                     <item name="AdditionalSource" type_name="gh_string" type_code="10">
   /// &lt;summary&gt;
   /// 3dグラフを示すクラスです。
   /// &lt;/summary&gt;
   public class Graph3d{
     public delegate Point3d Function3d(double u,double v);
+    /// &lt;summary&gt;
+    /// グラフで描画する関数。
+    /// &lt;/summary&gt;
     public Function3d F;
 
+    /// &lt;summary&gt;
+    /// u方向の描画範囲。
+    /// &lt;/summary&gt;
     public Interval uInterval = new Interval(-1, 1);
+    /// &lt;summary&gt;
+    /// v方向の描画範囲。
+    /// &lt;/summary&gt;
     public Interval vInterval = new Interval(-1, 1);
 
+    /// &lt;summary&gt;
+    /// コンストラクタ。
+    /// &lt;/summary&gt;
+    /// &lt;param name="f"&gt;グラフで描画する関数。&lt;/param&gt;
     public Graph3d(Function3d f){
       this.F = f;
     }
 
-    public Surface GetSurface(int uCount, int vCount){
+    /// &lt;summary&gt;
+    /// 関数が示すグラフをサーフェスとして取得します。
+    /// &lt;/summary&gt;
+    /// &lt;param name="uCount"&gt;u方向の解像度&lt;/param&gt;
+    /// &lt;param name="vCount"&gt;v方向の解像度。&lt;/param&gt;
+    /// &lt;returns&gt;目的の形状。&lt;/returns&gt;
+    public Surface GetSurface(int uCount=100, int vCount=100){
       var points = new List&lt;Point3d&gt;();
 
       for(int u = 0;u &lt; uCount;u++){
@@ -112,16 +131,19 @@
       return NurbsSurface.CreateFromPoints(points, uCount, vCount, 3, 3);
     }
 
-    public void BakeSurface(RhinoDoc rd, int uCount, int vCount){
-      rd.Objects.Add(GetSurface(uCount, vCount));
+    /// &lt;summary&gt;
+    /// 関数が示すサーフェスをBakeします。
+    /// &lt;/summary&gt;
+    /// &lt;param name="RhinoDocument"&gt;通常はRhinoDocumentと入力してください。&lt;/param&gt;
+    /// &lt;param name="uCount"&gt;u方向の解像度。&lt;/param&gt;
+    /// &lt;param name="vCount"&gt;v方向の解像度。&lt;/param&gt;
+    /// &lt;returns&gt;&lt;/returns&gt;
+    public void BakeSurface(RhinoDoc RhinoDocument, int uCount, int vCount){
+      RhinoDocument.Objects.Add(GetSurface(uCount, vCount));
     }
   }
 </item>
                     <item name="Description" type_name="gh_string" type_code="10">A C#.NET scriptable component</item>
-                    <item name="EditorPosition" type_name="gh_drawing_point" type_code="30">
-                      <X>82</X>
-                      <Y>74</Y>
-                    </item>
                     <item name="InstanceGuid" type_name="gh_guid" type_code="9">6a0bc0c7-f328-4d13-96cb-618f87852047</item>
                     <item name="Name" type_name="gh_string" type_code="10">C# Script</item>
                     <item name="NickName" type_name="gh_string" type_code="10">C#</item>
@@ -132,7 +154,7 @@
       AnntennGraph.BakeSurface(RhinoDocument, 100, 100);
     }
     {
-      var AnntennGraph = new Graph3d((u,v) =&gt; {return new Point3d(u, v, u * u *u + v * v);});
+      var AnntennGraph = new Graph3d((u,v) =&gt; {return new Point3d(u, v, u * u * u + v * v);});
       var surf2 = AnntennGraph.GetSurface(100, 100);
       surf2.Translate(2, 0, 0);
       RhinoDocument.Objects.Add(surf2);
