@@ -43,7 +43,7 @@ C#コンポーネント等で作成したジオメトリはgrasshopperウィン�
 ## よく使う手法
 GrasshopperのC#ではよく使う手法がいくつかあります。  
 サンプルは以下においてあります。  
-https://github.com/kurema/LearnGrasshopper/tree/master/src
+https://github.com/kurema/LearnGrasshopperCSharp/tree/master/src
 ### 基本
 Grasshopperやモデリングではよく使う手法はたいていC#上でそれなりに簡単に利用することができます。
 Script Editor を開いたらRunScript内にまず``A=Rhino.Geometry.``と打ち込んでください。そうすると予測変換の要領でいろんな文字が表示されます。これはモデリングソフトでの基本的なジオメトリ作成に相当する操作です。以下に例を挙げます。適当な行を抜き出して試してみてください。  
