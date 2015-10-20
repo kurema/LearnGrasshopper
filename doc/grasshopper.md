@@ -107,7 +107,40 @@ Pipe
 ```
 
 ### 変形する
+たいていのGeometryにはいくつかの変形処理が可能です。002.Transform.ghxにあります。Script editor上でTransform.と入力すると一覧が確認可能です。
 
+変形処理は、以下のような書き方で可能です。
+```
+    SomeGeometry.Transform(Transform.*));
+```
+
+移動はふたつの方法が出来ます。大抵、以下のように出来ます。
+```
+    SomeGeometry.Translate(1,3,4);
+```
+Translateが機能しない場合には次のように出来ます。
+```
+    SomeGeometry.Transform(Transform.Translation(1,3,4));
+```
+
+回転はTransform.Rotationで可能です。
+```
+    x.Transform(Transform.Rotation(Math.PI / 3.0, Vector3d.XAxis, Point3d.Origin));
+    A = x;
+```
+
+反転はTransform.Mirrorで可能です。
+```
+    x.Transform(Transform.Mirror(Plane.WorldXY));
+    A = x;
+```
+
+回転や平行移動を含めた座標平面の移動はTransform.PlaneToPlaneで可能です。  
+一つ目の引数に移動元、ふたつ目の引数が移動先の平面です。順番を混乱しがちなので気をつけてください。
+```
+    x.Transform(Transform.PlaneToPlane(Plane.WorldXY, new Plane(Point3d.Origin, new Vector3d(-1, 1, 0))));
+    A = x;
+```
 ### 3dグラフ
 3次元上の複数の点を通るサーフェスを表現する際に便利なのは``NurbsSurface.CreateFromPoints()``関数です。この関数はPoint3dの配列からそれを通るNurbsSurfaceを作ってくれます。
 厳密な意味で正しい形状が出来るわけではありませんが、それっぽい形を作るには便利です。
