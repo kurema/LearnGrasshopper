@@ -44,7 +44,7 @@ C#コンポーネント等で作成したジオメトリはgrasshopperウィン�
 GrasshopperのC#ではよく使う手法がいくつかあります。  
 サンプルは以下においてあります。  
 https://github.com/kurema/LearnGrasshopperCSharp/tree/master/src
-### 基本
+### 基本的な形状の作成
 Grasshopperやモデリングではよく使う手法はたいていC#上でそれなりに簡単に利用することができます。
 Script Editor を開いたらRunScript内にまず``A=Rhino.Geometry.``と打ち込んでください。そうすると予測変換の要領でいろんな文字が表示されます。これはモデリングソフトでの基本的なジオメトリ作成に相当する操作です。以下に例を挙げます。適当な行を抜き出して試してみてください。  
 000.basic.ghxにまとめてあります。
@@ -73,6 +73,7 @@ Script Editor を開いたらRunScript内にまず``A=Rhino.Geometry.``と打ち
     A = Rhino.Geometry.NurbsCurve.CreateInterpolatedCurve(new Point3d[]{new Point3d(0, 0, 0),new Point3d(5, 3, 0),new Point3d(8, -1, 0)}, 3);
 
 ```
+### 基本的な生成手法
 その他にいくつかの基本的な操作が可能です。
 
 まず立体を作るときによく使うExtrusionです。
@@ -103,6 +104,9 @@ Pipe
     var curve1 = NurbsCurve.CreateInterpolatedCurve(new Point3d[]{new Point3d(2, 0, 0),new Point3d(4, 0, 2),new Point3d(3, 0, 4)}, 3);
     A = Brep.CreatePipe(curve1, 1.0, false, PipeCapMode.Round, true, 0.1, 0.1);
 ```
+
+### 変形する
+
 ### 3dグラフ
 3次元上の複数の点を通るサーフェスを表現する際に便利なのは``NurbsSurface.CreateFromPoints()``関数です。この関数はPoint3dの配列からそれを通るNurbsSurfaceを作ってくれます。
 厳密な意味で正しい形状が出来るわけではありませんが、それっぽい形を作るには便利です。
