@@ -75,6 +75,7 @@ Script Editor を開いたらRunScript内にまず``A=Rhino.Geometry.``と打ち
 ```
 ### 基本的な生成手法
 その他にいくつかの基本的な操作が可能です。
+001.Generate.ghxにあります。
 
 まず立体を作るときによく使うExtrusionです。
 ```
@@ -111,7 +112,7 @@ Pipe
 3次元上の複数の点を通るサーフェスを表現する際に便利なのは``NurbsSurface.CreateFromPoints()``関数です。この関数はPoint3dの配列からそれを通るNurbsSurfaceを作ってくれます。
 厳密な意味で正しい形状が出来るわけではありませんが、それっぽい形を作るには便利です。
 
-001.3dGraph.ghxでは簡単な例を示しています。
+011.3dGraph.ghxでは簡単な例を示しています。
 ```
   private void RunScript(Interval x, Interval y, ref object A)
   {
@@ -130,7 +131,7 @@ Pipe
     A = Rhino.Geometry.NurbsSurface.CreateFromPoints(points.ToArray(), uCount, vCount, 3, 3);
   }
 ```
-002.3dGraphClass.ghxではより実践的なサンプルを載せています。クラスやdelegateといった説明していない複雑な手法を用いています。
+012.3dGraphClass.ghxではより実践的なサンプルを載せています。クラスやdelegateといった説明していない複雑な手法を用いています。
 時間がない場合にはあまり詳しく読み込む事はお勧めしません。そのままコピーして使ってください。
 ```
   /// <summary>
@@ -225,7 +226,7 @@ Pipe
 レイヤーがない場合には前者は-1を返すのでifを使って対処できます。
 その後上の例なら``objAttr.LayerIndex``に上で得たレイヤー番号を代入してください。
 
-005.BakeAdvanced.ghxは簡単に色とレイヤー名を指定できるようにしたものです。
+015.BakeAdvanced.ghxは簡単に色とレイヤー名を指定できるようにしたものです。
 ```
   private void RunScript(GeometryBase obj, List<Color> color, string layer, bool bake)
   {
