@@ -298,6 +298,11 @@ Translateが機能しない場合には次のように出来ます。
     }
   }
 ```
+この準備をしておくと簡単に3dグラフを利用することが出来ます。
+```
+      var Graph = new Graph3d((u,v) => {return new Point3d(u, v, u * u - v * v);});
+      Graph.BakeSurface(RhinoDocument, 100, 100);
+```
 ### 自動的にBakeする
 通常grasshopperではオブジェクトを追加する場合には手作業でBakeを行わなければならずレイヤー分けも自分で行わなければなりません。
 その際に便利なのは、``RhinoDocument.Objects.Add(geometry);``関数です。
