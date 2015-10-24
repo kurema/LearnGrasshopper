@@ -40,7 +40,8 @@ C#コンポーネント等で作成したジオメトリはgrasshopperウィン�
 プレビューが邪魔な場合はPreviewをクリックします。
 複数選択しスクロールボタンをクリックすることで複数のコンポーネントを一度に操作できます。
 なおBakeはC#コンポーネント上でも出来るので後で解説します。
-## よく使う手法
+
+## 基本手法
 GrasshopperのC#ではよく使う手法がいくつかあります。  
 サンプルは以下においてあります。  
 https://github.com/kurema/LearnGrasshopperCSharp/tree/master/src
@@ -141,6 +142,7 @@ Translateが機能しない場合には次のように出来ます。
     x.Transform(Transform.PlaneToPlane(Plane.WorldXY, new Plane(Point3d.Origin, new Vector3d(-1, 1, 0))));
     A = x;
 ```
+## 典型的操作
 ### 3dグラフ
 3次元上の複数の点を通るサーフェスを表現する際に便利なのは``NurbsSurface.CreateFromPoints()``関数です。この関数はPoint3dの配列からそれを通るNurbsSurfaceを作ってくれます。
 厳密な意味で正しい形状が出来るわけではありませんが、それっぽい形を作るには便利です。
