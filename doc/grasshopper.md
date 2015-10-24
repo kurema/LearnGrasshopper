@@ -143,7 +143,78 @@ Translateが機能しない場合には次のように出来ます。
     A = x;
 ```
 ## 典型的操作
-### 3dグラフ
+### 関数の示す曲線
+上で紹介した``NurbsCurve.CreateInterpolatedCurve``を利用して関数の示す曲線を簡単に作ることができます。ただし、関数は連続であると仮定し、有限のサンプルで近似するので場合によっては不適切な結果を示します。
+
+010.functionCurve.ghxではふたつの例を示しています。ひとつの例はその場で作成したものです。
+```
+    var points = new List<Point3d>();//サンプル点。
+    int tCount = 100;//サンプル点の数。
+    var tInterval = new Interval(0, 2);//関数の描画範囲。
+    for(double t = tInterval.Min;t <= tInterval.Max;t += tInterval.Length / tCount){//tIntervalの最小値からtIntervalの最大値までtLength/tCountずつ増やして繰り返し。
+      points.Add(new Point3d(t, Math.Pow(t, 2), Math.Pow(t, 3)));//(t,t^2,t^3)のサンプルを追加。
+    }
+    A = Rhino.Geometry.NurbsCurve.CreateInterpolatedCurve(points, 3);//pointsを滑らかにつなぐ。
+```
+もうひとつの例はクラスを使って定義し、delegate等の難しい機能を使ったものです。まず、下のコードを``// <Custom additional code>``(下側の空白)に追加してください。
+```
+  /// <summary>
+  /// 自由曲線を示すクラスです。
+  /// </summary>
+  public class CurveFunction{
+    public delegate Point3d Function3d(double u);
+    /// <summary>
+    /// グラフで描画する関数。
+    /// </summary>
+    public Function3d F;
+
+    /// <summary>
+    /// 直線の描画範囲。
+    /// </summary>
+    public Interval tInterval = new Interval(-1, 1);
+
+    /// <summary>
+    /// コンストラクタ。
+    /// </summary>
+    /// <param name="f">グラフで描画する関数。</param>
+    public CurveFunction(Function3d f){
+      this.F = f;
+    }
+
+    /// <summary>
+    /// 関数が示す曲線をサーフェスとして取得します。
+    /// </summary>
+    /// <param name="tCount">曲線の解像度</param>
+    /// <returns>目的の形状。</returns>
+    public Curve GetCurve(int tCount=100){
+      var points = new List<Point3d>();
+
+      for(int t = 0;t < tCount;t++){
+        double tValue = ((double) t / (double) (tCount - 1)) * tInterval.Length + tInterval.Min;
+        points.Add(F(tValue));
+      }
+      return Rhino.Geometry.NurbsCurve.CreateInterpolatedCurve(points, 3);
+    }
+
+    /// <summary>
+    /// 関数が示すサーフェスをBakeします。
+    /// </summary>
+    /// <param name="RhinoDocument">通常はRhinoDocumentと入力してください。</param>
+    /// <param name="tCount">直線の解像度。</param>
+    /// <returns></returns>
+    public void BakeCurve(RhinoDoc RhinoDocument, int tCount){
+      RhinoDocument.Objects.Add(GetCurve(tCount));
+    }
+  }
+```
+この準備をしておくと簡単に関数の示す曲線を描画することが出来ます。
+```
+    var cf = new CurveFunction((t) => {return new Point3d(Math.Sin(t), Math.Cos(t), t);}); //(sin(t),cos(t),t)の関数からCurveFunction型の変数を作る。
+    cf.tInterval = new Interval(0, 3 * Math.PI); //0～3πまで描画するように指定する。
+    A = cf.GetCurve(100); //サンプル数100で実際の曲線を作成する。
+    //cf.BakeCurve(RhinoDocument, 100); //サンプル数100で実際の曲線を作成してBakeする。
+```
+### 関数の示す曲面
 3次元上の複数の点を通るサーフェスを表現する際に便利なのは``NurbsSurface.CreateFromPoints()``関数です。この関数はPoint3dの配列からそれを通るNurbsSurfaceを作ってくれます。
 厳密な意味で正しい形状が出来るわけではありませんが、それっぽい形を作るには便利です。
 
