@@ -22,7 +22,7 @@
       <chunks count="5">
         <chunk name="DocumentHeader">
           <items count="5">
-            <item name="DocumentID" type_name="gh_guid" type_code="9">a0cec973-ca09-44d5-ad7c-837dc53e616f</item>
+            <item name="DocumentID" type_name="gh_guid" type_code="9">3505c79d-8dd6-4b51-88d5-9fd2c6c4bf7d</item>
             <item name="Preview" type_name="gh_string" type_code="10">Shaded</item>
             <item name="PreviewMeshType" type_name="gh_int32" type_code="3">1</item>
             <item name="PreviewNormal" type_name="gh_drawing_color" type_code="36">
@@ -35,9 +35,9 @@
         </chunk>
         <chunk name="DefinitionProperties">
           <items count="3">
-            <item name="Date" type_name="gh_date" type_code="8">635807859554586475</item>
+            <item name="Date" type_name="gh_date" type_code="8">635813312084761802</item>
             <item name="Description" type_name="gh_string" type_code="10"></item>
-            <item name="Name" type_name="gh_string" type_code="10">012.3dGraphClass.ghx</item>
+            <item name="Name" type_name="gh_string" type_code="10">018.DevelopableSimple.ghx</item>
           </items>
           <chunks count="3">
             <chunk name="Revisions">
@@ -48,10 +48,10 @@
             <chunk name="Projection">
               <items count="2">
                 <item name="Target" type_name="gh_drawing_point" type_code="30">
-                  <X>-116</X>
-                  <Y>74</Y>
+                  <X>105</X>
+                  <Y>165</Y>
                 </item>
-                <item name="Zoom" type_name="gh_single" type_code="5">3.05175781</item>
+                <item name="Zoom" type_name="gh_single" type_code="5">1.25</item>
               </items>
             </chunk>
             <chunk name="Views">
@@ -85,6 +85,56 @@
                 <chunk name="Container">
                   <items count="9">
                     <item name="AdditionalSource" type_name="gh_string" type_code="10">
+  /// &lt;summary&gt;
+  /// 自由曲線を示すクラスです。
+  /// &lt;/summary&gt;
+  public class CurveFunction{
+    public delegate Point3d Function3d(double u);
+    /// &lt;summary&gt;
+    /// グラフで描画する関数。
+    /// &lt;/summary&gt;
+    public Function3d F;
+
+    /// &lt;summary&gt;
+    /// 直線の描画範囲。
+    /// &lt;/summary&gt;
+    public Interval tInterval = new Interval(-1, 1);
+
+    /// &lt;summary&gt;
+    /// コンストラクタ。
+    /// &lt;/summary&gt;
+    /// &lt;param name="f"&gt;グラフで描画する関数。&lt;/param&gt;
+    public CurveFunction(Function3d f){
+      this.F = f;
+    }
+
+    /// &lt;summary&gt;
+    /// 関数が示す曲線をサーフェスとして取得します。
+    /// &lt;/summary&gt;
+    /// &lt;param name="tCount"&gt;曲線の解像度&lt;/param&gt;
+    /// &lt;returns&gt;目的の形状。&lt;/returns&gt;
+    public Curve GetCurve(int tCount=100){
+      var points = new List&lt;Point3d&gt;();
+
+      for(int t = 0;t &lt; tCount;t++){
+        double tValue = ((double) t / (double) (tCount - 1)) * tInterval.Length + tInterval.Min;
+        points.Add(F(tValue));
+      }
+      return Rhino.Geometry.NurbsCurve.CreateInterpolatedCurve(points, 3);
+    }
+
+    /// &lt;summary&gt;
+    /// 関数が示すサーフェスをBakeします。
+    /// &lt;/summary&gt;
+    /// &lt;param name="RhinoDocument"&gt;通常はRhinoDocumentと入力してください。&lt;/param&gt;
+    /// &lt;param name="tCount"&gt;直線の解像度。&lt;/param&gt;
+    /// &lt;returns&gt;&lt;/returns&gt;
+    public void BakeCurve(RhinoDoc RhinoDocument, int tCount){
+      RhinoDocument.Objects.Add(GetCurve(tCount));
+    }
+  }
+
+
   /// &lt;summary&gt;
   /// 3dグラフを示すクラスです。
   /// &lt;/summary&gt;
@@ -141,41 +191,42 @@
     public void BakeSurface(RhinoDoc RhinoDocument, int uCount, int vCount){
       RhinoDocument.Objects.Add(GetSurface(uCount, vCount));
     }
-  }
-</item>
+  }</item>
                     <item name="Description" type_name="gh_string" type_code="10">A C#.NET scriptable component</item>
                     <item name="EditorPosition" type_name="gh_drawing_point" type_code="30">
-                      <X>36</X>
-                      <Y>77</Y>
+                      <X>35</X>
+                      <Y>73</Y>
                     </item>
-                    <item name="InstanceGuid" type_name="gh_guid" type_code="9">6a0bc0c7-f328-4d13-96cb-618f87852047</item>
+                    <item name="InstanceGuid" type_name="gh_guid" type_code="9">e4573988-585b-481f-943a-10c4adb45614</item>
                     <item name="Name" type_name="gh_string" type_code="10">C# Script</item>
                     <item name="NickName" type_name="gh_string" type_code="10">C#</item>
                     <item name="OutParameter" type_name="gh_bool" type_code="1">true</item>
                     <item name="ReferenceCount" type_name="gh_int32" type_code="3">0</item>
-                    <item name="ScriptSource" type_name="gh_string" type_code="10">    {
-      var Graph = new Graph3d((u,v) =&gt; {return new Point3d(u, v, u * u - v * v);});
-      Graph.BakeSurface(RhinoDocument, 100, 100);
-    }
-    {
-      var Graph = new Graph3d((u,v) =&gt; {return new Point3d(u, v, u * u * u + v * v);});
-      var surf = Graph.GetSurface(100, 100);
-      surf.Translate(2, 0, 0);
-      RhinoDocument.Objects.Add(surf);
-    }</item>
+                    <item name="ScriptSource" type_name="gh_string" type_code="10">    var cf = new CurveFunction((t) =&gt; {return new Point3d(Math.Sin(t), Math.Cos(t), t);});
+    cf.tInterval = new Interval(0, 2 * Math.PI);
+    var curve = cf.GetCurve(300);
+    curve.Domain = new Interval(-1, 1);
+    var g3 = new Graph3d((u,v) =&gt; {
+      var　tan = curve.CurvatureAt(u);
+      var poi = curve.PointAt(u);
+      return poi + tan * v;
+      });
+    g3.vInterval = new Interval(0, 3);
+    g3.BakeSurface(RhinoDocument, 100, 100);
+    A = curve;</item>
                   </items>
                   <chunks count="2">
                     <chunk name="Attributes">
                       <items count="2">
                         <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                          <X>64</X>
-                          <Y>42</Y>
+                          <X>114</X>
+                          <Y>116</Y>
                           <W>59</W>
                           <H>44</H>
                         </item>
                         <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                          <X>78</X>
-                          <Y>64</Y>
+                          <X>128</X>
+                          <Y>138</Y>
                         </item>
                       </items>
                     </chunk>
@@ -191,7 +242,7 @@
                           <items count="7">
                             <item name="Access" type_name="gh_int32" type_code="3">1</item>
                             <item name="Description" type_name="gh_string" type_code="10">Print, Reflect and Error streams</item>
-                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">d6379d77-3d02-4f74-9680-ebc30e11fbac</item>
+                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">893ed96f-de46-4465-927e-e86f22c1a93e</item>
                             <item name="Name" type_name="gh_string" type_code="10">out</item>
                             <item name="NickName" type_name="gh_string" type_code="10">out</item>
                             <item name="Optional" type_name="gh_bool" type_code="1">false</item>
@@ -201,14 +252,14 @@
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>93</X>
-                                  <Y>44</Y>
+                                  <X>143</X>
+                                  <Y>118</Y>
                                   <W>28</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>107</X>
-                                  <Y>54</Y>
+                                  <X>157</X>
+                                  <Y>128</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -217,7 +268,7 @@
                         <chunk name="OutputParam" index="1">
                           <items count="6">
                             <item name="Description" type_name="gh_string" type_code="10">Output parameter A</item>
-                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">f030e6cb-c928-41e8-8666-41b65b311f48</item>
+                            <item name="InstanceGuid" type_name="gh_guid" type_code="9">2800d519-b7dd-42fc-b96f-201fa5460b5d</item>
                             <item name="Name" type_name="gh_string" type_code="10">A</item>
                             <item name="NickName" type_name="gh_string" type_code="10">A</item>
                             <item name="Optional" type_name="gh_bool" type_code="1">false</item>
@@ -227,14 +278,14 @@
                             <chunk name="Attributes">
                               <items count="2">
                                 <item name="Bounds" type_name="gh_drawing_rectanglef" type_code="35">
-                                  <X>93</X>
-                                  <Y>64</Y>
+                                  <X>143</X>
+                                  <Y>138</Y>
                                   <W>28</W>
                                   <H>20</H>
                                 </item>
                                 <item name="Pivot" type_name="gh_drawing_pointf" type_code="31">
-                                  <X>107</X>
-                                  <Y>74</Y>
+                                  <X>157</X>
+                                  <Y>148</Y>
                                 </item>
                               </items>
                             </chunk>
@@ -253,7 +304,7 @@
     <chunk name="Thumbnail">
       <items count="1">
         <item name="Thumbnail" type_name="gh_drawing_bitmap" type_code="37">
-          <bitmap length="1934">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</bitmap>
+          <bitmap length="867">iVBORw0KGgoAAAANSUhEUgAAAJYAAABkCAIAAADrOV6nAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAL4SURBVHhe7dc7S5thHIZxP4mLOGQS3ILooJ/AUYjiILioQVDUSRQcnV1E46TggUoihCKioiKeUg9ULYGo1VpKHVxc25skUsX6Lh0e7nL9hgxv3ne6+D+HCvwPfsHWn4RfYYiE9khoj4T2SGiPhPZIaI+E9khoj4T2SGiPhPZIaI+E9khoj4T2SGiPhPZIaI+E9khoj4T2SGiPhPZIaI+E9khoL2TC29vb+/v77y98e03/3t3dld/GO4IlVL9CoXB8fLz37PDw8OTkJJfLfXp2dHR0fn5OxWjBEl5fX5+dna2trS0uLn4oWlhY0JPHx8efRT+K1Fgvq3fpK7wVcgo1cxMTEz09Pd3d3X19ff39/Zubm3qobKurqxrKp6cnNZ6entYaW/4MbwRLKKenp4ODg62trfptbGxsamrKZDLLy8szMzNTU1Pb29vaC5VwYGBAaymD+J6QCTVtvb29yWRyf3+/ra2toaFBCZXqS9Hl5eXV1VU2m93a2mIKIwRLqFSlhM3NzS0tLYlEIh6PLy0t6a+Li4vPRaq4u7urWSx9gr8KOYU6cHZ2dmoVHR8f7+rqqqmpUcK5uTktnuqnTVEJ9YS9MFqwhNrelLC9vb2+vr6jo6Ourq62tla74Ozs7MrKio6mulToN51ODw0NsRdGCJZQSXTm1BZYWVlZVVUVi8Wqq6tTqVQ+n9fV8ODgoHRNnJ+f39nZYQojhJzC9fX1ycnJ4eHh0dHRkZGRsbExHWd0nfj4TGeZjY0N+kULllB0u9dR5eHhoXSXl5ubG51CX9KwsoRGC5lQSoUilN/D+wInxL8joT0S2iOhPRLaI6E9EtojoT0S2iOhPRLaI6E9EtojoT0S2iOhPRLaI6E9EtojoT0S2iOhPRLaI6E9EtojoT0S2iOhPRLaI6E9EtojoT0S2iOhPRLaI6E9EtojoT0S2iOhPRLaI6E9EtojoT0S2iOhPRLaI6E9EtojoT0S2iOhPRLaI6E9Etojob1XCWGqnBDGKip+A3bhA/M9sT6eAAAAAElFTkSuQmCC</bitmap>
         </item>
       </items>
     </chunk>
