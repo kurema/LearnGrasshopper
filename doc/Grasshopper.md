@@ -142,6 +142,54 @@ Translateが機能しない場合には次のように出来ます。
     x.Transform(Transform.PlaneToPlane(Plane.WorldXY, new Plane(Point3d.Origin, new Vector3d(-1, 1, 0))));
     A = x;
 ```
+### 曲線の分析
+曲線の評価にはたいてい、その曲線上の位置を示すパラメーターtを用います。tを用いない分析は長さやバウンディングボックスの取得程度です。
+```
+  private void RunScript(Curve x, ref object A)
+  {
+    double l=x.GetLength();//長さを評価
+
+    BoundingBox b = x.GetBoundingBox(true);//バウンディングボックス(曲線を覆う箱)を取得。
+  }
+```
+このパラメーターは曲面におけるuvのようなものです。
+ただし、このパラメーターは必ずしも長さに対応するわけでもなければ、0～1の値をとるわけでもありません。
+扱いやすくするために、このパラメーターを0～1の間の値を取るようにすると便利です。
+```
+    curve.Domain = new Interval(0, 1);
+```
+ためしに、t=0.5の場所と、長さがちょうど半分の場所を比べてみましょう。
+```
+  private void RunScript(Curve x, ref object A, ref object B)
+  {
+    x.Domain = new Interval(0, 1);
+    A = x.PointAt(0.5);
+    B = x.PointAtNormalizedLength(0.5);
+  }
+```
+結構違いますね。パラメーターは直接指定することはむしろまれで、いくつかの手法を用いて取得することで得られます。
+```
+  private void RunScript(Curve x, ref object A)
+  {
+    double t;
+    x.LengthParameter(1.4, out t);//始点からの長さでパラメーターを取得する。
+    x.NormalizedLengthParameter(0.3, out t);//始点からの長さの曲線長に対する割合でパラメーターを取得する。
+    x.ClosestPoint(new Point3d(0, 0, 0), out t);//ある点からもっとも近い曲線上の点を取得する。
+  }
+```
+これらの手法で得られたパラメーターを用いて、実際の座標や接線等を取得することが出来ます。
+```
+  private void RunScript(Curve x, ref object A, ref object B, ref object C)
+  {
+    double t;
+    x.ClosestPoint(new Point3d(0, 0, 0), out t);//ある点からもっとも近い曲線上の点を取得する。
+
+    A = x.PointAt(t);//パラメーターの示す座標を取得
+    B = x.CurvatureAt(t);//その点での曲率ベクトルを取得。
+    C = x.TangentAt(t);//その点での接線ベクトルを取得。
+  }
+```
+
 ## 典型的操作
 ### 関数の示す曲線
 上で紹介した``NurbsCurve.CreateInterpolatedCurve``を利用して関数の示す曲線を簡単に作ることができます。ただし、関数は連続であると仮定し、有限のサンプルで近似するので場合によっては不適切な結果を示します。
