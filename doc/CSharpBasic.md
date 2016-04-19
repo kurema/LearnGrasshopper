@@ -69,7 +69,7 @@ C#を含めたオブジェクト指向言語は以下のような特徴を持っ
 ```
 といった感じだ。これはどのプログラミング言語もほぼ同じだしどこかで学べるで解説しない。
 関数の定義だけ独特だ。
-ただしGrasshopperで使うだけなら話は簡単で、<Custom additional code>の間に、
+ただしGrasshopperで使うだけなら話は簡単で、&lt;Custom additional code&gt;の間に、
 ```
 public static 戻り値の型 関数名(引数の型 引数){
   プログラム
