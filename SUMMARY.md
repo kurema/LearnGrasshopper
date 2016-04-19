@@ -1,5 +1,5 @@
 # Summary
 
 * [この本について](README.md)
-* [C#について](doc/CSharpBasic.md)
+* [C#の書き方 基本編](doc/CSharpBasic.md)
 
